@@ -145,13 +145,74 @@ Function that calculates an elbow up Inverse Kinematic solution for the UR3
 """
 def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	# =================== Your code starts here ====================#
-	
-	theta1 = 0.0
-	theta2 = 0.0
-	theta3 = 0.0
-	theta4 = 0.0
-	theta5 = 0.0
-	theta6 = 0.0
-	
+
+	L1 = 0.152
+	L2 = 0.12
+	L3 = 0.244
+	L4 = 0.093
+	L5 = 0.213
+	L6 = 0.104
+	L7 = 0.085
+	L8 = 0.092
+	L9 = 0.0535
+	L10 = 0.059
+
+	xzero = 0.15
+	yzero = 0.15
+	zzero = 0.01
+	# 1
+	xgrip = xWgrip + xzero
+	ygrip = yWgrip - yzero
+	zgrip = zWgrip - zzero
+	print("xgrip: " + str(xgrip))
+	print("ygrip: " + str(ygrip))	
+	print("zgrip: " + str(zgrip))
+	# 2
+	xcen = xgrip - L9 * np.cos(np.deg2rad(yaw_WgripDegree))
+	ycen = ygrip - L9 * np.sin(np.deg2rad(yaw_WgripDegree))
+	zcen = zgrip 
+	print("xcen: " + str(xcen))
+	print("ycen: " + str(ycen))
+	print("zcen: " + str(zcen))
+	# 3
+	# theta1 = math.atan2(ycen, xcen)
+	a = math.atan2(ycen, xcen)
+	# LI
+	# c = math.atan2(L3+L5+L7,L2)
+	# theta1 = a+c-np.deg2rad(90)
+	d = L2 - L4 + L6 
+	r = np.sqrt(xcen**2 + ycen**2)
+	theta1 = a - math.asin(d / r)
+	print("a: " + str(np.rad2deg(a)))
+	# print("c: " + str(np.rad2deg(c)))
+
+	# 4 
+	theta6 = theta1 + np.deg2rad(90) - np.deg2rad(yaw_WgripDegree)
+	# 5
+	z3end = zcen + L10 + L8
+	# LI
+	# x3end = np.cos(theta1) * (L3 + L5)
+	# y3end = np.sin(theta1) * (L3 + L5)
+	x3end = xcen + d*sin(theta1)
+	y3end = ycen - d*cos(theta1)
+	# 6
+	X = x3end
+	Z = z3end - L1
+	R = np.sqrt(X**2 + Z**2)
+	theta2 = -math.atan2(Z,X) - math.acos((R**2 + L3**2 - L5**2)/(2*L3*R))
+	theta4 = math.atan2(L3* np.sin(theta2)+Z, X-L3*np.cos(theta2))
+	theta3 = -theta4 + -theta2
+	theta5 = np.deg2rad(-90)
+
+	print("theta1: " + str(np.rad2deg(theta1)))
+	print("theta2: " + str(np.rad2deg(theta2)))
+	print("theta3: " + str(np.rad2deg(theta3)))
+	print("theta4: " + str(np.rad2deg(theta4)))
+	print("theta5: " + str(np.rad2deg(theta5)))
+	print("theta6: " + str(np.rad2deg(theta6)))
+
+	# raise error
+	# raise NotImplementedError("Inverse kinematics function not implemented yet.")
+
 	# ==============================================================#
 	return lab_fk(theta1, theta2, theta3, theta4, theta5, theta6)
