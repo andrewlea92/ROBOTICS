@@ -103,9 +103,9 @@ def lab_fk(theta1, theta2, theta3, theta4, theta5, theta6):
 	T = np.eye(4)
 
 	M, S = Get_MS()
-	print("S matrix:")
-	print(S)
-	print("\n")
+	# print("S matrix:")
+	# print(S)
+	# print("\n")
 	# for i in range(6):
 	# 	w = S[i][:3]
 	# 	v = S[i][3:]
@@ -122,13 +122,13 @@ def lab_fk(theta1, theta2, theta3, theta4, theta5, theta6):
 		s_skew[:3, :3] = w_hat
 		s_skew[:3, 3] = v
 
-		print(f"t{i}", str(expm(s_skew * theta[i])) + "\n")
-		print(f"skew{i}", str(s_skew) + "\n")
+		# print(f"t{i}", str(expm(s_skew * theta[i])) + "\n")
+		# print(f"skew{i}", str(s_skew) + "\n")
 		T = T @ expm(s_skew * theta[i])
 	# ==============================================================#
 
 	T_06 = T @ M  
-	print("T_06", str(T_06) + "\n\n")
+	print("T", str(T_06) + "\n\n")
 
 	return_value[0] = theta1 + pi
 	return_value[1] = theta2
@@ -175,32 +175,45 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	print("ycen: " + str(ycen))
 	print("zcen: " + str(zcen))
 	# 3
-	# theta1 = math.atan2(ycen, xcen)
+
 	a = math.atan2(ycen, xcen)
-	# LI
-	# c = math.atan2(L3+L5+L7,L2)
-	# theta1 = a+c-np.deg2rad(90)
-	d = L2 - L4 + L6 
-	r = np.sqrt(xcen**2 + ycen**2)
-	theta1 = a - math.asin(d / r)
+	D1 = np.sqrt(xcen**2 + ycen**2)
+	c = math.acos(L2/D1)
+	theta1 = a + c - np.deg2rad(90)
+
+	# theta1 = a - math.asin(d / r)
 	print("a: " + str(np.rad2deg(a)))
-	# print("c: " + str(np.rad2deg(c)))
+	print("c: " + str(np.rad2deg(c)))
 
 	# 4 
 	theta6 = theta1 + np.deg2rad(90) - np.deg2rad(yaw_WgripDegree)
+
+
 	# 5
 	z3end = zcen + L10 + L8
+	print("z3end: " + str(z3end))
 	# LI
-	# x3end = np.cos(theta1) * (L3 + L5)
-	# y3end = np.sin(theta1) * (L3 + L5)
-	x3end = xcen + d*sin(theta1)
-	y3end = ycen - d*cos(theta1)
+	# endl =  L6 + 0.027
+	# x3end = xcen - (L7 * np.cos(theta1))
+	# y3end = ycen - (endl * np.cos(theta1))
+	# y3end = ycen - np.sqrt(L6**2 + L7**2)
+	T = np.array([ - L7, - L6 - 0.027, 1])
+	rot_z_angle = np.array([[np.cos(theta1), -np.sin(theta1), xcen], [np.sin(theta1), np.cos(theta1), ycen], [0, 0, 1]])
+	final_pos = np.dot(rot_z_angle, T)
+	x3end = final_pos[0]
+	y3end = final_pos[1]
+
+	print("x3end: " + str(x3end))
+	print("y3end: " + str(y3end))
 	# 6
-	X = x3end
+	X = np.sqrt(x3end**2 + y3end**2)
 	Z = z3end - L1
 	R = np.sqrt(X**2 + Z**2)
+	print("X: " + str(X))
+	print("Z: " + str(Z))
+	print("R: " + str(R))
 	theta2 = -math.atan2(Z,X) - math.acos((R**2 + L3**2 - L5**2)/(2*L3*R))
-	theta4 = math.atan2(L3* np.sin(theta2)+Z, X-L3*np.cos(theta2))
+	theta4 = -math.atan2(L3* np.sin(-theta2)-Z, X-L3*np.cos(-theta2))
 	theta3 = -theta4 + -theta2
 	theta5 = np.deg2rad(-90)
 
