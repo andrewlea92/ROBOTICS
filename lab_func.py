@@ -177,9 +177,14 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	# 3
 
 	a = math.atan2(ycen, xcen)
-	D1 = np.sqrt(xcen**2 + ycen**2)
+	# D1 = np.sqrt(xcen**2 + ycen**2)
+
+	D1 = math.hypot(xcen, ycen)
+	d = L2 - L4 + L6 
+	theta1 = a - math.asin(d / D1)
+
 	c = math.acos(L2/D1)
-	theta1 = a + c - np.deg2rad(90)
+	# theta1 = a + c - np.deg2rad(90)
 
 	# theta1 = a - math.asin(d / r)
 	print("a: " + str(np.rad2deg(a)))
